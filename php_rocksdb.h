@@ -6,7 +6,7 @@
 extern zend_module_entry rocksdb_module_entry;
 # define phpext_rocksdb_ptr &rocksdb_module_entry
 
-# define PHP_ROCKSDB_VERSION "0.1.0"
+# define PHP_ROCKSDB_VERSION "0.1.0-dev"
 
 
 #define PHP_ROCKSDB_STARTUP(module)               ZEND_MODULE_STARTUP_N(php_rocksdb_##module)(INIT_FUNC_ARGS_PASSTHRU)

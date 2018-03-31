@@ -77,6 +77,8 @@ if test "$PHP_ROCKSDB" != "no"; then
   dnl PHP_SUBST(ROCKSDB_SHARED_LIBADD)
 
   dnl # In case of no dependencies
+  PHP_ADD_LIBRARY_WITH_PATH("rocksdb", "/usr/local/include", ROCKSDB_SHARED_LIBADD)
+  PHP_SUBST(ROCKSDB_SHARED_LIBADD)
   AC_DEFINE(HAVE_ROCKSDB, 1, [ Have rocksdb support ])
 
   PHP_NEW_EXTENSION(rocksdb, 
