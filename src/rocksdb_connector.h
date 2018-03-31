@@ -1,0 +1,5 @@
+#ifndef ROCKSDB_CONNECTOR_H
+#define ROCKSDB_CONNECTOR_H
+PHP_METHOD(RocksDBConnector, InitDB);
+PHP_ROCKSDB_STARTUP_FUNCTION(RocksDBConnector);
+#endif
