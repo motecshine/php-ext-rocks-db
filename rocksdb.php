@@ -6,3 +6,5 @@ if (!extension_loaded('rocksdb')) {
 use RocksDB\RDB;
 
 $connector = new RDB(); 
+
+var_dump($connector->connect());

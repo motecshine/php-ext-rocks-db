@@ -7,12 +7,12 @@
 
 #include "php_rocksdb.h"
 #include "src/rocksdb_connector.h"
+#include <assert.h>
 
 
-
-const char DBPath[] = "/tmp/rocksdb_simple_example";
-const char DBBackupPath[] = "/tmp/rocksdb_simple_example_backup";
-
+// Default DB path
+const char DBPath[] = "/tmp/rocksdb";
+const char DBBackupPath[] = "/tmp/rocksdb_backup";
 ZEND_BEGIN_ARG_INFO(init_db_arg_info, 0)
     ZEND_ARG_INFO(0, init_config)
 ZEND_END_ARG_INFO()
@@ -20,25 +20,29 @@ ZEND_END_ARG_INFO()
 
 PHP_METHOD(RocksDBConnector, __construct)
 {
-
+    if ((ZEND_NUM_ARGS() != 0)) {
+        WRONG_PARAM_COUNT;
+    }
     options = rocksdb_options_create();
-    long cpus = sysconf(_SC_NPROCESSORS_ONLN); 
-    rocksdb_options_increase_parallelism(options, (int)(cpus));
+    rocksdb_options_increase_parallelism(options, (int)(sysconf(_SC_NPROCESSORS_ONLN)));
     rocksdb_options_optimize_level_style_compaction(options, 0);
-
     rocksdb_options_set_create_if_missing(options, 1);
-
-    char *err = NULL;
-    db = rocksdb_open(options, DBPath, &err);
-    assert(!err);
-    // open Backup Engine that we will use for backing up our database
-    be = rocksdb_backup_engine_open(options, DBBackupPath, &err);
-    assert(!err);
 }
 
+PHP_METHOD(RocksDBConnector, connect)
+{
+  char *err = NULL;
+  db = rocksdb_open(options, DBPath, &err);
+  if (err) {
+    RETURN_BOOL(false)
+  } else {
+    RETURN_ZVAL(getThis(), 0 , 0);
+  }
+}
 
 static zend_function_entry rocksdb_connector_methods[] = {
     PHP_ME(RocksDBConnector, __construct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+    PHP_ME(RocksDBConnector, connect, NULL, ZEND_ACC_PUBLIC)
     PHP_FE_END
 };
 
