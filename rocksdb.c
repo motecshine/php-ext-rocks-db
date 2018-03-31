@@ -7,8 +7,16 @@
 #include "php.h"
 #include "ext/standard/info.h"
 #include "php_rocksdb.h"
+#include "src/rocksdb_connector.h"
 
 
+/* {{{ PHP_MINIT_FUNCTION
+ */
+PHP_MINIT_FUNCTION(rocksdb)
+{
+	PHP_ROCKSDB_STARTUP(RocksDBConnector);
+}
+/* }}} */
 
 /* {{{ PHP_RINIT_FUNCTION
  */
@@ -46,7 +54,7 @@ zend_module_entry rocksdb_module_entry = {
 	STANDARD_MODULE_HEADER,
 	"rocksdb",					/* Extension name */
 	rocksdb_functions,			/* zend_function_entry */
-	NULL,							/* PHP_MINIT - Module initialization */
+	PHP_MINIT(rocksdb),							/* PHP_MINIT - Module initialization */
 	NULL,							/* PHP_MSHUTDOWN - Module shutdown */
 	PHP_RINIT(rocksdb),			/* PHP_RINIT - Request initialization */
 	NULL,							/* PHP_RSHUTDOWN - Request shutdown */

@@ -79,5 +79,8 @@ if test "$PHP_ROCKSDB" != "no"; then
   dnl # In case of no dependencies
   AC_DEFINE(HAVE_ROCKSDB, 1, [ Have rocksdb support ])
 
-  PHP_NEW_EXTENSION(rocksdb, rocksdb.c, $ext_shared)
+  PHP_NEW_EXTENSION(rocksdb, 
+  rocksdb.c   \
+  src/rocksdb_connector.c, 
+  $ext_shared)
 fi
