@@ -21,9 +21,7 @@ rocksdb_readoptions_t *readoptions;
 extern zend_class_entry *rc_ce;
 #define THROW_ERROR()  if (err)     \
   {                                 \
-    RETURN_STRING(err);             \
-  } else { \
-    RETURN_ZVAL(getThis(), 0 , 0);  \
+    assert(!err);             \
   }
 
 ZEND_BEGIN_ARG_INFO(init_db_arg_info, 0)
@@ -65,7 +63,6 @@ PHP_METHOD(RocksDBConnector, put)
   const char *value = "value";
   writeoptions = rocksdb_writeoptions_create();
   rocksdb_put(db, writeoptions, key, strlen(key), value, strlen(value) + 1, &err);
-  rocksdb_writeoptions_destroy(writeoptions);
   THROW_ERROR()
 }
 
@@ -75,22 +72,20 @@ PHP_METHOD(RocksDBConnector, get)
   char *err = NULL;
   const char key[] = "key";
   readoptions = rocksdb_readoptions_create();
-
   char *returned_value = rocksdb_get(db, readoptions, key, strlen(key), &len, &err);
- 
-  rocksdb_readoptions_destroy(readoptions);
   RETURN_STR(zend_string_init(returned_value, len, 0));
  
 }
 
 
-PHP_METHOD(RocksDBConnector, __destruct)
+PHP_METHOD(RocksDBConnector, close)
 {
+  rocksdb_writeoptions_destroy(writeoptions);
+  rocksdb_readoptions_destroy(readoptions);
   rocksdb_options_destroy(options);
-  rocksdb_backup_engine_close(be);
-
-  // rocksdb_close(db);
- 
+  rocksdb_backup_engine_close(be); 
+  rocksdb_close(db);
+  RETURN_BOOL(true);
 }
 
 static zend_function_entry rocksdb_connector_methods[] = {
@@ -98,7 +93,7 @@ static zend_function_entry rocksdb_connector_methods[] = {
     PHP_ME(RocksDBConnector, connect, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDBConnector, put, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDBConnector, get, NULL, ZEND_ACC_PUBLIC)
-    PHP_ME(RocksDBConnector, __destruct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_DTOR)
+    PHP_ME(RocksDBConnector, close, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDBConnector, enableBackup, NULL, ZEND_ACC_PUBLIC)
     PHP_FE_END
 };

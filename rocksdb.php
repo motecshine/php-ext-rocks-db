@@ -6,6 +6,8 @@ if (!extension_loaded('rocksdb')) {
 use RocksDB\RDB;
 
 $connector = new RDB(); 
-$rocksdbInstance = $connector->connect()->enableBackup();
+$connector->connect();
+$connector->enableBackup();
 
-var_dump($rocksdbInstance->get());
+var_dump($connector->get());
+var_dump($connector->close());
