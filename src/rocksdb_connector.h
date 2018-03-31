@@ -1,7 +1,5 @@
 #ifndef ROCKSDB_CONNECTOR_H
 #define ROCKSDB_CONNECTOR_H
-static zend_class_entry *rc_ce;
-
 PHP_METHOD(RocksDBConnector, __construct);
 PHP_METHOD(RocksDBConnector, put);
 PHP_METHOD(RocksDBConnector, get);
