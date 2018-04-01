@@ -18,8 +18,8 @@ const char DBBackupPath[] = "/tmp/rocksdb_backup";
 rocksdb_t *db;
 rocksdb_backup_engine_t *be;
 rocksdb_options_t *options;
-rocksdb_writeoptions_t *writeoptions;
-rocksdb_readoptions_t *readoptions;
+rocksdb_writeoptions_t *write_options;
+rocksdb_readoptions_t *read_options;
 rocksdb_restore_options_t *restore_options;       
 
 ZEND_BEGIN_ARG_INFO(rocksdb_get_arg_info, 0)
@@ -101,9 +101,9 @@ PHP_METHOD(RocksDB, put)
 
   c_key = ZSTR_VAL(key);
   c_value = ZSTR_VAL(value);
-  writeoptions = rocksdb_writeoptions_create();
+  write_options = rocksdb_writeoptions_create();
   if (db != NULL) {
-    rocksdb_put(db, writeoptions, c_key, strlen(c_key), c_value, strlen(c_value) + 1, &err);
+    rocksdb_put(db, write_options, c_key, strlen(c_key), c_value, strlen(c_value) + 1, &err);
     ROCKSDB_CHECK_FOR_ERRORS(err);
     RETURN_BOOL(true);
   } else {
@@ -120,10 +120,10 @@ PHP_METHOD(RocksDB, get)
   ZEND_PARSE_PARAMETERS_START(1, 1)
     Z_PARAM_STR(key)
   ZEND_PARSE_PARAMETERS_END();
-  readoptions = rocksdb_readoptions_create();
+  read_options = rocksdb_readoptions_create();
   c_key = ZSTR_VAL(key);
   if (db != NULL) {
-    returned_value = rocksdb_get(db, readoptions, c_key, strlen(c_key), &len, &err);
+    returned_value = rocksdb_get(db, read_options, c_key, strlen(c_key), &len, &err);
     if (returned_value != NULL) {
       RETURN_STR(zend_string_init(returned_value, len, 0));
     } 
@@ -131,14 +131,13 @@ PHP_METHOD(RocksDB, get)
   RETURN_BOOL(false);    
 }
 
-
 PHP_METHOD(RocksDB, delete)
 {
   char *err, *c_key;
   size_t len;
   zend_string *key;
-  if (writeoptions == NULL) {
-     writeoptions = rocksdb_writeoptions_create();
+  if (write_options == NULL) {
+     write_options = rocksdb_writeoptions_create();
   }
 
   if (db == NULL) {
@@ -148,7 +147,7 @@ PHP_METHOD(RocksDB, delete)
     Z_PARAM_STR(key)
   ZEND_PARSE_PARAMETERS_END();
   c_key = ZSTR_VAL(key);
-  rocksdb_delete(db, writeoptions, c_key, (size_t)strlen(c_key), &err);
+  rocksdb_delete(db, write_options, c_key, (size_t)strlen(c_key), &err);
   ROCKSDB_CHECK_FOR_ERRORS(err);
 }
 
