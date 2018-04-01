@@ -7,8 +7,6 @@ use RocksDB\RDB;
 
 $connector = new RDB(); 
 $connector->connect();
-$connector->enableBackup();
-
-var_dump($connector->put("key", "zhu"));
-var_dump($connector->get("key"));
+//$connector->restoreLastBackup();
+var_dump($connector->get("key2"));
 var_dump($connector->close());

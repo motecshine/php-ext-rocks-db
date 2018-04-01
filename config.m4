@@ -83,6 +83,6 @@ if test "$PHP_ROCKSDB" != "no"; then
 
   PHP_NEW_EXTENSION(rocksdb, 
   rocksdb.c   \
-  src/rocksdb_connector.c, 
+  src/rocksdb.c, 
   $ext_shared)
 fi

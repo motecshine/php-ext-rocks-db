@@ -7,14 +7,15 @@
 #include "php.h"
 #include "ext/standard/info.h"
 #include "php_rocksdb.h"
-#include "src/rocksdb_connector.h"
+#include "src/rocksdb.h"
 
 
 /* {{{ PHP_MINIT_FUNCTION
  */
 PHP_MINIT_FUNCTION(rocksdb)
 {
-	PHP_ROCKSDB_STARTUP(RocksDBConnector);
+	PHP_ROCKSDB_STARTUP(RocksDB);
+	return SUCCESS;
 }
 /* }}} */
 
