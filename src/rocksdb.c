@@ -97,7 +97,7 @@ PHP_METHOD(RocksDB, put)
   c_value = ZSTR_VAL(value);
   writeoptions = rocksdb_writeoptions_create();
   if (db != NULL) {
-    rocksdb_put(db, writeoptions, c_key, strlen(c_key), c_value, strlen(c_value) + 1, &err);
+    rocksdb_put(db, writeoptions, (const char *)c_key, strlen(c_key), (const char *)c_value, strlen(c_value) + 1, &err);
     IF_ERROR_THROWN()
   } else {
      // @todo need thrown db exception
@@ -115,7 +115,7 @@ PHP_METHOD(RocksDB, get)
   ZEND_PARSE_PARAMETERS_END();
   readoptions = rocksdb_readoptions_create();
   c_key = ZSTR_VAL(key);
-  returned_value = rocksdb_get(db, readoptions, c_key, strlen(c_key), &len, &err);
+  returned_value = rocksdb_get(db, readoptions, (const char *) c_key, strlen(c_key), &len, &err);
   if (returned_value != NULL) {
     RETURN_STR(zend_string_init(returned_value, len, 0));
   } else {
