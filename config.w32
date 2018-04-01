@@ -1,7 +1,0 @@
-ARG_ENABLE('rocksdb', 'rocksdb support', 'no');
-
-if (PHP_ROCKSDB != 'no') {
-	AC_DEFINE('HAVE_ROCKSDB', 1, 'rocksdb support enabled');
-
-	EXTENSION('rocksdb', 'rocksdb.c', null, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
-}
