@@ -1,2 +1,10 @@
 # php-ext-rocks-db
-rocksdb for  php extension
+
+## REUQIRE
+- PHP > 7.0
+- RocksDB LIB > 2.5
+
+## INSTALLTION
+```shell
+    phpize && make install
+```
