@@ -72,7 +72,7 @@ PHP_METHOD(RocksDB, restoreLastBackup)
 {
   char *err = NULL;
   restore_options = rocksdb_restore_options_create();
-  rocksdb_backup_engine_restore_db_from_latest_backup(be, DBPath, DBPath, restore_options, &err);
+  //rocksdb_backup_engine_restore_db_from_latest_backup(be, DBPath, DBPath, restore_options, &err);
   THROW_ERROR()
 }
 
