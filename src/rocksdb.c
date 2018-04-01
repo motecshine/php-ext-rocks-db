@@ -13,7 +13,6 @@
 		assert(!err); \
 	}
 
-// Default DB path
 const char DBPath[] = "/tmp/rocksdb";
 const char DBBackupPath[] = "/tmp/rocksdb_backup";
 rocksdb_t *db;
@@ -151,8 +150,6 @@ PHP_METHOD(RocksDB, delete)
   rocksdb_delete(db, writeoptions, (const char *)c_key, (size_t)strlen(c_key), &err);
   ROCKSDB_CHECK_FOR_ERRORS(err);
 }
-
-
 
 PHP_METHOD(RocksDB, __destruct)
 {
