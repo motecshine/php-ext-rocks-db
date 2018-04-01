@@ -153,12 +153,12 @@ PHP_METHOD(RocksDB, delete)
 
 PHP_METHOD(RocksDB, __destruct)
 {
-  if (writeoptions != NULL) {
-    rocksdb_writeoptions_destroy(writeoptions);
+  if (write_options != NULL) {
+    rocksdb_writeoptions_destroy(write_options);
   }
   
-  if (readoptions != NULL) {
-    rocksdb_readoptions_destroy(readoptions); 
+  if (read_options != NULL) {
+    rocksdb_readoptions_destroy(read_options); 
   }
   
   if (options != NULL) {
