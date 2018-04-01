@@ -19,13 +19,19 @@ rocksdb_options_t *options;
 rocksdb_writeoptions_t *writeoptions;
 rocksdb_readoptions_t *readoptions;
 extern zend_class_entry *rc_ce;
-#define THROW_ERROR()  if (err)     \
-  {                                 \
-    assert(!err);             \
+#define THROW_ERROR()  if (err) {   \
+    assert(!err);                   \
+  } else {                          \
+    RETURN_BOOL(true);              \
   }
+  
+ZEND_BEGIN_ARG_INFO(rocksdb_get_arg_info, 0)
+   ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO(init_db_arg_info, 0)
-    ZEND_ARG_INFO(0, init_config)
+ZEND_BEGIN_ARG_INFO(rocksdb_put_arg_info, 0)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
 
@@ -38,19 +44,18 @@ PHP_METHOD(RocksDBConnector, __construct)
     rocksdb_options_increase_parallelism(options, (int)(sysconf(_SC_NPROCESSORS_ONLN)));
     rocksdb_options_optimize_level_style_compaction(options, 0);
     rocksdb_options_set_create_if_missing(options, 1);
-    // default enable backup
 }
 
 PHP_METHOD(RocksDBConnector, connect)
 {
-  char *err = NULL;
+  char *err;
   db = rocksdb_open(options, DBPath, &err);
   THROW_ERROR()
 }
 
 PHP_METHOD(RocksDBConnector, enableBackup)
 {
-  char *err = NULL;
+  char *err;
   be = rocksdb_backup_engine_open(options, DBBackupPath, &err);
   THROW_ERROR()
 }
@@ -58,21 +63,31 @@ PHP_METHOD(RocksDBConnector, enableBackup)
 
 PHP_METHOD(RocksDBConnector, put)
 {
-  char *err = NULL;
-  const char key[] = "key";
-  const char *value = "value";
+  char *err, *c_key, *c_value;
+  zend_string *key, *value;
+  ZEND_PARSE_PARAMETERS_START(2, 2)
+    Z_PARAM_STR(key)
+    Z_PARAM_STR(value)
+  ZEND_PARSE_PARAMETERS_END();
+
+  c_key = ZSTR_VAL(key);
+  c_value = ZSTR_VAL(value);
   writeoptions = rocksdb_writeoptions_create();
-  rocksdb_put(db, writeoptions, key, strlen(key), value, strlen(value) + 1, &err);
+  rocksdb_put(db, writeoptions, c_key, strlen(c_key), c_value, strlen(c_value) + 1, &err);
   THROW_ERROR()
 }
 
 PHP_METHOD(RocksDBConnector, get)
 {
   size_t len;
-  char *err = NULL;
-  const char key[] = "key";
+  char *err,  *c_key, *returned_value;
+  zend_string *key;
+  ZEND_PARSE_PARAMETERS_START(1, 1)
+    Z_PARAM_STR(key)
+  ZEND_PARSE_PARAMETERS_END();
   readoptions = rocksdb_readoptions_create();
-  char *returned_value = rocksdb_get(db, readoptions, key, strlen(key), &len, &err);
+  c_key = ZSTR_VAL(key);
+  returned_value = rocksdb_get(db, readoptions, c_key, strlen(c_key), &len, &err);
   RETURN_STR(zend_string_init(returned_value, len, 0));
  
 }

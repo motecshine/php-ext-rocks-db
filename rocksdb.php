@@ -9,5 +9,6 @@ $connector = new RDB();
 $connector->connect();
 $connector->enableBackup();
 
-var_dump($connector->get());
+var_dump($connector->put("key", "zhu"));
+var_dump($connector->get("key"));
 var_dump($connector->close());
