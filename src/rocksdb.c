@@ -9,7 +9,7 @@
 #include "src/rocksdb.h"
 #include "rocksdb/c.h"
 #define ROCKSDB_CHECK_FOR_ERRORS(err) \
-	if ((err) != NULL) { \
+	if (err != NULL) { \
 		assert(!err); \
 	}
 
@@ -122,12 +122,14 @@ PHP_METHOD(RocksDB, get)
   ZEND_PARSE_PARAMETERS_END();
   readoptions = rocksdb_readoptions_create();
   c_key = ZSTR_VAL(key);
-  returned_value = rocksdb_get(db, readoptions, (const char *) c_key, strlen(c_key), &len, &err);
-  if (returned_value != NULL) {
-    RETURN_STR(zend_string_init(returned_value, len, 0));
-  } else {
-    RETURN_BOOL(false);   
+  if (db != NULL) {
+    returned_value = rocksdb_get(db, readoptions, (const char *) c_key, strlen(c_key), &len, &err);
+    if (returned_value != NULL) {
+      RETURN_STR(zend_string_init(returned_value, len, 0));
+    } 
+    
   }
+  RETURN_BOOL(false);    
 }
 
 
