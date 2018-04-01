@@ -20,11 +20,7 @@ rocksdb_writeoptions_t *writeoptions;
 rocksdb_readoptions_t *readoptions;
 rocksdb_restore_options_t *restore_options;
 
-#define THROW_ERROR()  if (err) {   \
-    assert(!err);                   \
-  } else {                          \
-    RETURN_BOOL(true);              \
-  }  
+#define IF_ERROR_THROWN() assert(!err);                
 
 ZEND_BEGIN_ARG_INFO(rocksdb_get_arg_info, 0)
    ZEND_ARG_INFO(0, key)
@@ -51,29 +47,40 @@ PHP_METHOD(RocksDB, connect)
 {
   char *err;
   db = rocksdb_open(options, DBPath, &err);
-  THROW_ERROR()
+  IF_ERROR_THROWN()
 }
 
 PHP_METHOD(RocksDB, enableBackup)
 {
   char *err;
   be = rocksdb_backup_engine_open(options, DBBackupPath, &err);
-  THROW_ERROR()
+  IF_ERROR_THROWN()
 }
 
 PHP_METHOD(RocksDB, newBackup)
 {
   char *err;
-  rocksdb_backup_engine_create_new_backup(be, db, &err);
-  THROW_ERROR()
+  if (be != NULL && db != NULL) {
+    rocksdb_backup_engine_create_new_backup(be, db, &err);
+    IF_ERROR_THROWN()
+    RETURN_BOOL(true);
+  } else {
+    RETURN_BOOL(false);
+  }
 }
 
 PHP_METHOD(RocksDB, restoreLastBackup)
 {
   char *err = NULL;
   restore_options = rocksdb_restore_options_create();
-  //rocksdb_backup_engine_restore_db_from_latest_backup(be, DBPath, DBPath, restore_options, &err);
-  THROW_ERROR()
+  // if backup not enabled
+  if (be != NULL) {
+    rocksdb_backup_engine_restore_db_from_latest_backup(be, DBPath, DBPath, restore_options, &err);
+    IF_ERROR_THROWN()
+    RETURN_BOOL(true);
+  } else {
+    RETURN_BOOL(false);
+  }
 }
 
 PHP_METHOD(RocksDB, put)
@@ -88,8 +95,13 @@ PHP_METHOD(RocksDB, put)
   c_key = ZSTR_VAL(key);
   c_value = ZSTR_VAL(value);
   writeoptions = rocksdb_writeoptions_create();
-  rocksdb_put(db, writeoptions, c_key, strlen(c_key), c_value, strlen(c_value) + 1, &err);
-  THROW_ERROR()
+  if (db != NULL) {
+    rocksdb_put(db, writeoptions, c_key, strlen(c_key), c_value, strlen(c_value) + 1, &err);
+    IF_ERROR_THROWN()
+  } else {
+     // @todo need thrown db exception
+     RETURN_BOOL(false);
+  }
 }
 
 PHP_METHOD(RocksDB, get)
@@ -108,7 +120,6 @@ PHP_METHOD(RocksDB, get)
   } else {
     RETURN_BOOL(false);   
   }
- 
 }
 
 PHP_METHOD(RocksDB, close)
