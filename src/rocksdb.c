@@ -103,7 +103,7 @@ PHP_METHOD(RocksDB, put)
   c_value = ZSTR_VAL(value);
   writeoptions = rocksdb_writeoptions_create();
   if (db != NULL) {
-    rocksdb_put(db, writeoptions, (const char *)c_key, strlen(c_key), (const char *)c_value, strlen(c_value) + 1, &err);
+    rocksdb_put(db, writeoptions, c_key, strlen(c_key), c_value, strlen(c_value) + 1, &err);
     ROCKSDB_CHECK_FOR_ERRORS(err);
     RETURN_BOOL(true);
   } else {
@@ -123,7 +123,7 @@ PHP_METHOD(RocksDB, get)
   readoptions = rocksdb_readoptions_create();
   c_key = ZSTR_VAL(key);
   if (db != NULL) {
-    returned_value = rocksdb_get(db, readoptions, (const char *) c_key, strlen(c_key), &len, &err);
+    returned_value = rocksdb_get(db, readoptions, c_key, strlen(c_key), &len, &err);
     if (returned_value != NULL) {
       RETURN_STR(zend_string_init(returned_value, len, 0));
     } 
@@ -148,7 +148,7 @@ PHP_METHOD(RocksDB, delete)
     Z_PARAM_STR(key)
   ZEND_PARSE_PARAMETERS_END();
   c_key = ZSTR_VAL(key);
-  rocksdb_delete(db, writeoptions, (const char *)c_key, (size_t)strlen(c_key), &err);
+  rocksdb_delete(db, writeoptions, c_key, (size_t)strlen(c_key), &err);
   ROCKSDB_CHECK_FOR_ERRORS(err);
 }
 
