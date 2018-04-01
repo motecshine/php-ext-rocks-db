@@ -127,7 +127,6 @@ PHP_METHOD(RocksDB, get)
     if (returned_value != NULL) {
       RETURN_STR(zend_string_init(returned_value, len, 0));
     } 
-    
   }
   RETURN_BOOL(false);    
 }
