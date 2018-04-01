@@ -55,6 +55,7 @@ PHP_METHOD(RocksDB, enableBackup)
   char *err;
   be = rocksdb_backup_engine_open(options, DBBackupPath, &err);
   IF_ERROR_THROWN()
+  RETURN_BOOL(true);
 }
 
 PHP_METHOD(RocksDB, newBackup)
@@ -122,7 +123,7 @@ PHP_METHOD(RocksDB, get)
   }
 }
 
-PHP_METHOD(RocksDB, close)
+PHP_METHOD(RocksDB, __destruct)
 {
   if (writeoptions != NULL) {
     rocksdb_writeoptions_destroy(writeoptions);
@@ -155,7 +156,7 @@ static zend_function_entry rocksdb_connector_methods[] = {
     PHP_ME(RocksDB, connect, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, put, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, get, NULL, ZEND_ACC_PUBLIC)
-    PHP_ME(RocksDB, close, NULL, ZEND_ACC_PUBLIC)
+    PHP_ME(RocksDB, __destruct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_DTOR)
     PHP_ME(RocksDB, enableBackup, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, newBackup, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, restoreLastBackup, NULL, ZEND_ACC_PUBLIC)

@@ -7,5 +7,6 @@ PHP_METHOD(RocksDB, get);
 PHP_METHOD(RocksDB, enableBackup);
 PHP_METHOD(RocksDB, newBackup);
 PHP_METHOD(RocksDB, restoreLastBackup);
+PHP_METHOD(RocksDB, __destruct);
 PHP_ROCKSDB_STARTUP_FUNCTION(RocksDB);
 #endif
