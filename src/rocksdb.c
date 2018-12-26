@@ -8,16 +8,17 @@
 #include "php_rocksdb.h"
 #include "src/rocksdb.h"
 #include "rocksdb/c.h"
+#include "stdio.h"
 #define ROCKSDB_CHECK_FOR_ERRORS(err) \
 	if (err != NULL) { \
-		assert(!err); \
+		assert(err); \
 	}
 
 const char DBPath[] = "/tmp/rocksdb";
 const char DBBackupPath[] = "/tmp/rocksdb_backup";
 rocksdb_t *db;
 rocksdb_backup_engine_t *be;
-rocksdb_options_t *options;
+rocksdb_options_t *options = NULL;
 rocksdb_writeoptions_t *write_options;
 rocksdb_readoptions_t *read_options;
 rocksdb_restore_options_t *restore_options;       
@@ -39,6 +40,7 @@ ZEND_END_ARG_INFO()
 
 PHP_METHOD(RocksDB, __construct)
 {
+    
     if ((ZEND_NUM_ARGS() != 0)) {
         WRONG_PARAM_COUNT;
     }
@@ -51,7 +53,11 @@ PHP_METHOD(RocksDB, __construct)
 PHP_METHOD(RocksDB, connect)
 {
   char *err;
+  if (options == NULL) {
+    RETURN_BOOL(false);
+  }
   db = rocksdb_open(options, DBPath, &err);
+
   ROCKSDB_CHECK_FOR_ERRORS(err);
   RETURN_BOOL(true);
 }
@@ -137,7 +143,7 @@ PHP_METHOD(RocksDB, delete)
   size_t len;
   zend_string *key;
   if (write_options == NULL) {
-     write_options = rocksdb_writeoptions_create();
+    write_options = rocksdb_writeoptions_create();
   }
 
   if (db == NULL) {
@@ -180,12 +186,12 @@ PHP_METHOD(RocksDB, __destruct)
 }
 
 static zend_function_entry rocksdb_connector_methods[] = {
-    PHP_ME(RocksDB, __construct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+    PHP_ME(RocksDB, __construct, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, connect, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, put, rocksdb_put_arg_info, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, get, rocksdb_get_arg_info, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, delete, rocksdb_delete_arg_info, ZEND_ACC_PUBLIC)
-    PHP_ME(RocksDB, __destruct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_DTOR)
+    PHP_ME(RocksDB, __destruct, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, enableBackup, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, newBackup, NULL, ZEND_ACC_PUBLIC)
     PHP_ME(RocksDB, restoreLastBackup, NULL, ZEND_ACC_PUBLIC)
